@@ -3,45 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ORBIOS internet | Real-Time IP & Network Information</title>
-    <meta name="description" content="Get your real IP address, location, ISP, and network information instantly. Free IP lookup tool.">
+    <title>ORBIOS internet | Advanced IP Intelligence Platform</title>
+    <meta name="description" content="Get your real IP address, location, ISP, security score, and advanced network intelligence. Free IP lookup tool with unique features.">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         display: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
                         orbios: {
                             dark: '#050505',
                             primary: '#00f0ff',
                             secondary: '#7000ff',
-                            surface: '#121212'
+                            accent: '#ff006e',
+                            surface: '#121212',
+                            success: '#22c55e',
+                            warning: '#eab308',
+                            danger: '#ef4444'
                         }
                     },
                     animation: {
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'float': 'float 6s ease-in-out infinite',
                         'spin-slow': 'spin 8s linear infinite',
+                        'glitch': 'glitch 2s infinite',
+                        'scan': 'scan 3s linear infinite',
+                        'blink': 'blink 1s step-end infinite',
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-20px)' },
+                        },
+                        glitch: {
+                            '0%, 100%': { transform: 'translate(0)' },
+                            '20%': { transform: 'translate(-2px, 2px)' },
+                            '40%': { transform: 'translate(-2px, -2px)' },
+                            '60%': { transform: 'translate(2px, 2px)' },
+                            '80%': { transform: 'translate(2px, -2px)' },
+                        },
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        },
+                        blink: {
+                            '0%, 50%': { opacity: '1' },
+                            '51%, 100%': { opacity: '0' },
                         }
                     }
                 }
@@ -54,6 +81,15 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00f0ff;
+            --secondary: #7000ff;
+            --accent: #ff006e;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
         }
 
         body {
@@ -70,27 +106,28 @@
             width: 100%;
             height: 100vh;
             z-index: -1;
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
         .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .glass-card {
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             transition: all 0.3s ease;
         }
 
         .glass-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(0, 240, 255, 0.3);
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(0, 240, 255, 0.2);
             transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.1);
         }
 
         .text-gradient {
@@ -101,7 +138,7 @@
         }
 
         .text-gradient-accent {
-            background: linear-gradient(135deg, #00f0ff 0%, #7000ff 100%);
+            background: linear-gradient(135deg, #00f0ff 0%, #7000ff 50%, #ff006e 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -132,23 +169,21 @@
         }
 
         .btn-glow:hover {
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.5);
             transform: translateY(-2px);
         }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #050505;
+            background: #0a0a0a;
         }
         ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+            background: linear-gradient(180deg, #00f0ff, #7000ff);
+            border-radius: 3px;
         }
 
         .nav-link {
@@ -158,10 +193,10 @@
             content: '';
             position: absolute;
             width: 0;
-            height: 1px;
+            height: 2px;
             bottom: -4px;
             left: 0;
-            background-color: #00f0ff;
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
             transition: width 0.3s ease;
         }
         .nav-link:hover::after {
@@ -172,7 +207,7 @@
             background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
-            border-radius: 4px;
+            border-radius: 6px;
         }
 
         @keyframes loading {
@@ -188,23 +223,26 @@
         }
         .status-online {
             background-color: #22c55e;
-            box-shadow: 0 0 10px #22c55e;
+            box-shadow: 0 0 12px #22c55e;
+            animation: pulse 2s infinite;
         }
         .status-loading {
             background-color: #eab308;
-            box-shadow: 0 0 10px #eab308;
+            box-shadow: 0 0 12px #eab308;
             animation: pulse 1s infinite;
         }
         .status-error {
             background-color: #ef4444;
-            box-shadow: 0 0 10px #ef4444;
+            box-shadow: 0 0 12px #ef4444;
         }
 
         .copy-btn {
             transition: all 0.2s ease;
+            cursor: pointer;
         }
         .copy-btn:hover {
-            background: rgba(0, 240, 255, 0.1);
+            background: rgba(0, 240, 255, 0.15);
+            transform: scale(1.05);
         }
         .copy-btn:active {
             transform: scale(0.95);
@@ -214,35 +252,39 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
         .data-row:last-child {
             border-bottom: none;
         }
         .data-label {
-            color: #888;
-            font-size: 0.875rem;
+            color: #777;
+            font-size: 0.825rem;
+            font-weight: 500;
         }
         .data-value {
             color: #fff;
             font-weight: 500;
             text-align: right;
-            word-break: break-all;
-            max-width: 60%;
+            word-break: break-word;
+            max-width: 55%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
         }
 
         .flag-emoji {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin-right: 8px;
         }
 
         .map-container {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 12px;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border-radius: 16px;
             overflow: hidden;
             position: relative;
-            min-height: 200px;
+            min-height: 220px;
+            border: 1px solid rgba(0, 240, 255, 0.1);
         }
 
         .pulse-ring {
@@ -259,37 +301,192 @@
                 opacity: 1;
             }
             100% {
-                width: 100px;
-                height: 100px;
+                width: 120px;
+                height: 120px;
                 opacity: 0;
             }
         }
 
-        /* Toast Animation */
-        .toast-enter {
-            transform: translateY(100%);
-            opacity: 0;
+        /* Score Circle */
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--score-color) var(--score-percent), rgba(255,255,255,0.1) 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
-        .toast-enter-active {
-            transform: translateY(0);
-            opacity: 1;
-            transition: all 0.3s ease;
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #0a0a0a;
         }
-        .toast-exit {
-            transform: translateY(0);
-            opacity: 1;
+        .score-value {
+            position: relative;
+            z-index: 1;
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .toast-exit-active {
-            transform: translateY(100%);
-            opacity: 0;
-            transition: all 0.3s ease;
+
+        /* Glitch Effect */
+        .glitch-text {
+            position: relative;
+        }
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .glitch-text::before {
+            animation: glitch-1 2s infinite linear alternate-reverse;
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+            color: #00f0ff;
+            z-index: -1;
+        }
+        .glitch-text::after {
+            animation: glitch-2 3s infinite linear alternate-reverse;
+            clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+            color: #ff006e;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            60% { transform: translateX(-1px); }
+            80% { transform: translateX(1px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes glitch-2 {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(2px); }
+            40% { transform: translateX(-2px); }
+            60% { transform: translateX(1px); }
+            80% { transform: translateX(-1px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Scan Line */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00f0ff, transparent);
+            animation: scan 3s linear infinite;
+            opacity: 0.5;
+        }
+
+        /* IP Display Box - Mobile Optimized */
+        .ip-display-box {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(112, 0, 255, 0.05) 100%);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .ip-display-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00f0ff, #7000ff, transparent);
+        }
+
+        .ip-address {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(1.25rem, 5vw, 2.5rem);
+            font-weight: 700;
+            word-break: break-all;
+            line-height: 1.3;
+            text-align: center;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* Badge Styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .badge-warning {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .badge-info {
+            background: rgba(0, 240, 255, 0.15);
+            color: #00f0ff;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        /* API Status */
+        .api-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 24px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .api-status.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .api-status.loading {
+            background: rgba(234, 179, 8, 0.1);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+        .api-status.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         /* Loading Spinner */
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(0, 240, 255, 0.3);
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 240, 255, 0.2);
             border-radius: 50%;
             border-top-color: #00f0ff;
             animation: spin 1s ease-in-out infinite;
@@ -299,27 +496,141 @@
             to { transform: rotate(360deg); }
         }
 
-        /* API Status Indicator */
-        .api-status {
-            display: inline-flex;
+        /* Progress Bar */
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Feature Card Hover Effect */
+        .feature-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: #0a0a0a;
+            border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 20px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        /* Responsive Grid */
+        @media (max-width: 768px) {
+            .data-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+            .data-value {
+                text-align: left;
+                max-width: 100%;
+                word-break: break-all;
+            }
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .theme-toggle.active {
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+        }
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .theme-toggle.active::after {
+            transform: translateX(24px);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: #1a1a1a;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
             font-size: 0.75rem;
-            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .api-status.success {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-        }
-        .api-status.loading {
-            background: rgba(234, 179, 8, 0.1);
-            color: #eab308;
-        }
-        .api-status.error {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-4px);
         }
     </style>
 </head>
@@ -329,31 +640,38 @@
     <div id="canvas-container"></div>
 
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 top-0 left-0 border-b border-white/5 bg-black/70 backdrop-blur-md">
+    <nav class="fixed w-full z-50 top-0 left-0 border-b border-white/5 bg-black/80 backdrop-blur-xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-purple-600 to-pink-600 flex items-center justify-center animate-pulse-slow">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
                         </svg>
                     </div>
-                    <span class="font-display font-bold text-xl tracking-wider text-white">ORBIOS <span class="text-orbios-primary">internet</span></span>
-                </div>
-                <div class="hidden md:block">
-                    <div class="flex items-baseline space-x-8">
-                        <a href="#home" class="nav-link text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">Home</a>
-                        <a href="#ip-info" class="nav-link text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">IP Info</a>
-                        <a href="#network" class="nav-link text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">Network</a>
-                        <a href="#tools" class="nav-link text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">Tools</a>
+                    <div>
+                        <span class="font-display font-bold text-xl tracking-wider text-white block">ORBIOS</span>
+                        <span class="text-xs text-orbios-primary font-mono -mt-1 block">INTERNET</span>
                     </div>
                 </div>
-                <div>
-                    <button onclick="refreshIPData()" class="btn-glow bg-white text-black px-5 py-2 rounded-lg font-medium text-sm hover:bg-white/90 transition-all flex items-center gap-2">
+                <div class="hidden lg:flex items-baseline space-x-8">
+                    <a href="#home" class="nav-link text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">Dashboard</a>
+                    <a href="#ip-info" class="nav-link text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">IP Details</a>
+                    <a href="#security" class="nav-link text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">Security</a>
+                    <a href="#network" class="nav-link text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">Network</a>
+                    <a href="#tools" class="nav-link text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">Tools</a>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 mr-2">
+                        <span class="text-xs text-gray-400">Dark</span>
+                        <div id="theme-toggle" class="theme-toggle active" onclick="toggleTheme()"></div>
+                        <span class="text-xs text-gray-400">Light</span>
+                    </div>
+                    <button onclick="refreshIPData()" class="btn-glow bg-white text-black px-4 py-2 rounded-xl font-medium text-sm hover:bg-white/90 transition-all flex items-center gap-2" title="Refresh Data (R)">
                         <svg id="refresh-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
-                        Refresh
+                        <span class="hidden sm:inline">Refresh</span>
                     </button>
                 </div>
             </div>
@@ -361,125 +679,232 @@
     </nav>
 
     <!-- Main Content -->
-    <main id="home" class="relative pt-24 pb-16 min-h-screen">
+    <main id="home" class="relative pt-20 pb-16 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <!-- Hero Section -->
-            <div class="text-center mb-12">
+            <div class="text-center mb-10 pt-8">
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel mb-6">
                     <span id="system-status-dot" class="status-dot status-loading"></span>
-                    <span id="system-status-text" class="text-xs font-medium text-gray-300 uppercase tracking-widest">Initializing...</span>
+                    <span id="system-status-text" class="text-xs font-medium text-gray-300 uppercase tracking-widest">Initializing System...</span>
                 </div>
 
                 <h1 class="text-4xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight mb-6 leading-tight">
-                    Your Digital <br />
-                    <span class="text-gradient-accent">Identity</span>
+                    <span class="glitch-text" data-text="Your Digital">Your Digital</span> <br />
+                    <span class="text-gradient-accent">Identity Map</span>
                 </h1>
                 
-                <p class="text-lg text-gray-400 max-w-2xl mx-auto">
-                    Real-time IP address detection, network information, and geolocation data. 
-                    All information is fetched live from your connection.
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto px-4">
+                    Advanced IP intelligence platform with real-time threat detection, 
+                    security scoring, and comprehensive network analysis.
                 </p>
             </div>
 
-            <!-- API Status -->
+            <!-- API Status & Quick Stats -->
             <div class="max-w-4xl mx-auto mb-8">
-                <div class="glass-panel rounded-xl p-4 flex items-center justify-between flex-wrap gap-4">
-                    <div class="flex items-center gap-3">
+                <div class="glass-panel rounded-2xl p-4 flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-4 flex-wrap">
                         <span class="text-sm text-gray-400">Data Source:</span>
                         <span id="api-source" class="api-status loading">
                             <span class="status-dot status-loading"></span>
                             Connecting...
                         </span>
+                        <span class="text-sm text-gray-400 hidden sm:inline">|</span>
+                        <span class="text-sm text-gray-400">Requests:</span>
+                        <span id="request-count" class="text-sm font-mono text-orbios-primary">0</span>
                     </div>
-                    <div class="flex items-center gap-4 text-sm text-gray-400">
-                        <span>Last Update: <span id="last-update" class="text-white">--:--:--</span></span>
+                    <div class="flex items-center gap-4 text-sm text-gray-400 flex-wrap">
+                        <span>Last Update: <span id="last-update" class="text-white font-mono">--:--:--</span></span>
                     </div>
                 </div>
             </div>
 
             <!-- Main IP Display Card -->
-            <div id="ip-info" class="max-w-4xl mx-auto mb-12">
-                <div class="glass-panel rounded-2xl p-8 md:p-10">
+            <div id="ip-info" class="max-w-5xl mx-auto mb-10">
+                <div class="glass-panel rounded-3xl p-6 md:p-10">
                     <div class="text-center mb-8">
-                        <p class="text-gray-400 text-sm uppercase tracking-widest mb-3">Your Public IP Address</p>
-                        <div id="ip-loading" class="flex items-center justify-center py-8">
+                        <p class="text-gray-400 text-sm uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4 text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            Your Public IP Address
+                        </p>
+                        
+                        <div id="ip-loading" class="flex items-center justify-center py-10">
                             <div class="spinner"></div>
                         </div>
+                        
                         <div id="ip-content" class="hidden">
-                            <div class="flex items-center justify-center gap-4 flex-wrap">
-                                <h2 id="ipv4-display" class="text-3xl md:text-5xl font-mono font-bold text-white px-4 py-2">
-                                    --
-                                </h2>
-                                <button onclick="copyToClipboard('ipv4-display')" class="copy-btn p-3 rounded-lg glass-card" title="Copy IP">
-                                    <svg class="w-5 h-5 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                    </svg>
-                                </button>
+                            <!-- IPv4 Display -->
+                            <div class="ip-display-box">
+                                <div class="flex items-center justify-center gap-3 flex-wrap mb-3">
+                                    <span class="badge badge-info">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                                        </svg>
+                                        IPv4
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-center gap-3 flex-wrap">
+                                    <div class="ip-address" id="ipv4-display">--</div>
+                                    <button onclick="copyToClipboard('ipv4-display', 'IPv4')" class="copy-btn p-3 rounded-xl glass-card" title="Copy IPv4">
+                                        <svg class="w-5 h-5 text-gray-400 hover:text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                    <button onclick="showQRCode('ipv4-display')" class="copy-btn p-3 rounded-xl glass-card" title="Show QR Code">
+                                        <svg class="w-5 h-5 text-gray-400 hover:text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
-                            <p id="ipv6-display" class="text-lg md:text-xl font-mono text-gray-500 mt-4">
-                                Loading IPv6...
-                            </p>
+
+                            <!-- IPv6 Display -->
+                            <div class="ip-display-box" style="background: linear-gradient(135deg, rgba(112, 0, 255, 0.05) 0%, rgba(255, 0, 110, 0.05) 100%); border-color: rgba(112, 0, 255, 0.2);">
+                                <div class="flex items-center justify-center gap-3 flex-wrap mb-3">
+                                    <span class="badge badge-warning">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                        IPv6
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-center gap-3 flex-wrap">
+                                    <div class="ip-address" id="ipv6-display" style="font-size: clamp(0.875rem, 3vw, 1.5rem);">Detecting IPv6...</div>
+                                    <button onclick="copyToClipboard('ipv6-display', 'IPv6')" class="copy-btn p-3 rounded-xl glass-card" title="Copy IPv6">
+                                        <svg class="w-5 h-5 text-gray-400 hover:text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div id="ip-error" class="hidden py-8">
-                            <div class="text-red-400 text-lg mb-2">⚠️ Unable to fetch IP address</div>
-                            <p class="text-gray-500 text-sm">This may be due to ad blockers, network restrictions, or API rate limits.</p>
-                            <button onclick="refreshIPData()" class="mt-4 btn-glow bg-white text-black px-6 py-2 rounded-lg font-medium text-sm">
+                        
+                        <div id="ip-error" class="hidden py-10">
+                            <div class="text-orbios-danger text-lg mb-3 flex items-center justify-center gap-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                Unable to fetch IP address
+                            </div>
+                            <p class="text-gray-500 text-sm mb-4">This may be due to ad blockers, network restrictions, or API rate limits.</p>
+                            <button onclick="refreshIPData()" class="btn-glow bg-white text-black px-6 py-2 rounded-xl font-medium text-sm">
                                 Try Again
                             </button>
                         </div>
                     </div>
 
-                    <!-- Connection Status -->
-                    <div id="connection-status-bar" class="flex items-center justify-center gap-6 mb-8 hidden">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-green-400" id="connection-status">●</div>
-                            <div class="text-xs text-gray-500 uppercase mt-1">Status</div>
+                    <!-- Connection Status Bar -->
+                    <div id="connection-status-bar" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 hidden">
+                        <div class="glass-card rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-bold text-green-400 mb-1" id="connection-status">●</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Connection</div>
+                            <div class="text-sm text-gray-300 mt-1" id="connection-type">--</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-orbios-primary" id="protocol-display">--</div>
-                            <div class="text-xs text-gray-500 uppercase mt-1">Protocol</div>
+                        <div class="glass-card rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-bold text-orbios-primary mb-1" id="protocol-display">--</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Protocol</div>
+                            <div class="text-sm text-gray-300 mt-1" id="protocol-version">--</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-purple-400" id="proxy-detect">--</div>
-                            <div class="text-xs text-gray-500 uppercase mt-1">Proxy</div>
+                        <div class="glass-card rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-bold text-purple-400 mb-1" id="proxy-detect">--</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Proxy/VPN</div>
+                            <div class="text-sm text-gray-300 mt-1" id="proxy-status">--</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-yellow-400" id="hosting-detect">--</div>
-                            <div class="text-xs text-gray-500 uppercase mt-1">Hosting</div>
+                        <div class="glass-card rounded-2xl p-4 text-center">
+                            <div class="text-2xl font-bold text-yellow-400 mb-1" id="hosting-detect">--</div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider">Hosting</div>
+                            <div class="text-sm text-gray-300 mt-1" id="hosting-status">--</div>
                         </div>
                     </div>
 
-                    <!-- Location Map Placeholder -->
-                    <div id="location-map" class="map-container h-48 md:h-64 mb-8 flex items-center justify-center relative hidden">
+                    <!-- Location Map -->
+                    <div id="location-map" class="map-container h-56 md:h-72 mb-8 flex items-center justify-center relative hidden">
+                        <div class="scan-line"></div>
                         <div id="map-content" class="text-center z-10"></div>
                         <div class="pulse-ring" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                    </div>
+
+                    <!-- Security Score Section -->
+                    <div id="security-scores" class="grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                        <div class="glass-card rounded-2xl p-6 text-center">
+                            <h4 class="text-sm text-gray-400 uppercase tracking-wider mb-4">Security Score</h4>
+                            <div class="score-circle mx-auto" id="security-score-circle" style="--score-color: #22c55e; --score-percent: 0deg;">
+                                <span class="score-value" id="security-score">--</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-3" id="security-rating">Analyzing...</p>
+                        </div>
+                        <div class="glass-card rounded-2xl p-6 text-center">
+                            <h4 class="text-sm text-gray-400 uppercase tracking-wider mb-4">Privacy Score</h4>
+                            <div class="score-circle mx-auto" id="privacy-score-circle" style="--score-color: #eab308; --score-percent: 0deg;">
+                                <span class="score-value" id="privacy-score">--</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-3" id="privacy-rating">Analyzing...</p>
+                        </div>
+                        <div class="glass-card rounded-2xl p-6 text-center">
+                            <h4 class="text-sm text-gray-400 uppercase tracking-wider mb-4">Trust Score</h4>
+                            <div class="score-circle mx-auto" id="trust-score-circle" style="--score-color: #00f0ff; --score-percent: 0deg;">
+                                <span class="score-value" id="trust-score">--</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-3" id="trust-rating">Analyzing...</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Quick Actions -->
+            <div class="max-w-5xl mx-auto mb-10">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <button onclick="copyAllData()" class="glass-card rounded-xl p-4 text-center hover:border-orbios-primary/50 transition-all">
+                        <svg class="w-6 h-6 mx-auto mb-2 text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-sm font-medium text-white">Copy All</p>
+                    </button>
+                    <button onclick="downloadJSON()" class="glass-card rounded-xl p-4 text-center hover:border-orbios-primary/50 transition-all">
+                        <svg class="w-6 h-6 mx-auto mb-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <p class="text-sm font-medium text-white">Export JSON</p>
+                    </button>
+                    <button onclick="downloadCSV()" class="glass-card rounded-xl p-4 text-center hover:border-orbios-primary/50 transition-all">
+                        <svg class="w-6 h-6 mx-auto mb-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p class="text-sm font-medium text-white">Export CSV</p>
+                    </button>
+                    <button onclick="shareData()" class="glass-card rounded-xl p-4 text-center hover:border-orbios-primary/50 transition-all">
+                        <svg class="w-6 h-6 mx-auto mb-2 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                        </svg>
+                        <p class="text-sm font-medium text-white">Share</p>
+                    </button>
+                </div>
+            </div>
+
             <!-- Detailed Information Grid -->
-            <div id="info-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 hidden">
+            <div id="info-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 hidden">
                 
                 <!-- Location Info -->
-                <div class="glass-card rounded-xl p-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="glass-card rounded-2xl p-6 feature-card">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-white">Location</h3>
+                        <h3 class="text-lg font-semibold text-white">Geolocation</h3>
                     </div>
                     <div id="location-data"></div>
                 </div>
 
                 <!-- Network Info -->
-                <div class="glass-card rounded-xl p-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="glass-card rounded-2xl p-6 feature-card">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
                             </svg>
                         </div>
@@ -489,10 +914,10 @@
                 </div>
 
                 <!-- Device Info -->
-                <div class="glass-card rounded-xl p-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="glass-card rounded-2xl p-6 feature-card">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                             </svg>
                         </div>
@@ -500,24 +925,126 @@
                     </div>
                     <div id="device-data"></div>
                 </div>
+
+                <!-- Browser Fingerprint -->
+                <div id="fingerprint-card" class="glass-card rounded-2xl p-6 feature-card">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-pink-500/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.85.577-4.147l.1-.276"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white">Fingerprint</h3>
+                    </div>
+                    <div id="fingerprint-data"></div>
+                </div>
+
+                <!-- DNS Info -->
+                <div id="dns-card" class="glass-card rounded-2xl p-6 feature-card">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-green-500/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white">DNS Servers</h3>
+                    </div>
+                    <div id="dns-data"></div>
+                </div>
+
+                <!-- Connection Quality -->
+                <div id="quality-card" class="glass-card rounded-2xl p-6 feature-card">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-11 h-11 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white">Connection</h3>
+                    </div>
+                    <div id="quality-data"></div>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div id="security" class="mb-10">
+                <h3 class="text-2xl font-display font-bold mb-6 text-center flex items-center justify-center gap-3">
+                    <svg class="w-7 h-7 text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    Security Analysis
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-400">Blacklist Status</span>
+                            <span id="blacklist-status" class="badge badge-success">Clean</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%;"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Checked against 50+ blacklists</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-400">Threat Level</span>
+                            <span id="threat-level" class="badge badge-success">Low</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 15%; background: linear-gradient(90deg, #22c55e, #22c55e);"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Real-time threat intelligence</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-400">WebRTC Leak</span>
+                            <span id="webrtc-status" class="badge badge-success">Protected</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%;"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Browser leak protection</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm text-gray-400">TLS/SSL</span>
+                            <span id="tls-status" class="badge badge-success">Secure</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%;"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Connection encryption</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Full Data Table -->
-            <div id="network" class="glass-panel rounded-2xl p-6 md:p-8 mb-12 hidden">
-                <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
-                    <h3 class="text-xl font-semibold text-white">Complete Network Information</h3>
-                    <div class="flex gap-2">
+            <div id="network" class="glass-panel rounded-3xl p-6 md:p-10 mb-10 hidden">
+                <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+                    <h3 class="text-xl font-semibold text-white flex items-center gap-3">
+                        <svg class="w-6 h-6 text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Complete Network Information
+                    </h3>
+                    <div class="flex gap-2 flex-wrap">
                         <button onclick="downloadJSON()" class="text-sm text-orbios-primary hover:text-white transition-colors flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
-                            Download JSON
+                            JSON
+                        </button>
+                        <button onclick="downloadCSV()" class="text-sm text-orbios-primary hover:text-white transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            CSV
                         </button>
                         <button onclick="copyAllData()" class="text-sm text-orbios-primary hover:text-white transition-colors flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                             </svg>
-                            Copy All
+                            Copy
                         </button>
                     </div>
                 </div>
@@ -525,54 +1052,96 @@
             </div>
 
             <!-- Tools Section -->
-            <div id="tools" class="mb-12">
-                <h3 class="text-2xl font-display font-bold mb-6 text-center">Network Tools</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <a href="https://speedtest.net" target="_blank" rel="noopener noreferrer" class="glass-card rounded-xl p-6 text-center hover:border-orbios-primary/50 transition-all">
+            <div id="tools" class="mb-10">
+                <h3 class="text-2xl font-display font-bold mb-6 text-center flex items-center justify-center gap-3">
+                    <svg class="w-7 h-7 text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Network Tools
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <a href="https://speedtest.net" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-6 text-center hover:border-orbios-primary/50 transition-all feature-card">
                         <svg class="w-8 h-8 mx-auto mb-3 text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
-                        <p class="font-medium text-white">Speed Test</p>
-                        <p class="text-xs text-gray-500 mt-1">Test your connection</p>
+                        <p class="font-medium text-white text-sm">Speed Test</p>
+                        <p class="text-xs text-gray-500 mt-1">Bandwidth</p>
                     </a>
-                    <a href="https://ping.eu" target="_blank" rel="noopener noreferrer" class="glass-card rounded-xl p-6 text-center hover:border-orbios-primary/50 transition-all">
+                    <a href="https://ping.eu" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-6 text-center hover:border-orbios-primary/50 transition-all feature-card">
                         <svg class="w-8 h-8 mx-auto mb-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <p class="font-medium text-white">Ping Test</p>
-                        <p class="text-xs text-gray-500 mt-1">Check latency</p>
+                        <p class="font-medium text-white text-sm">Ping Test</p>
+                        <p class="text-xs text-gray-500 mt-1">Latency</p>
                     </a>
-                    <a href="https://dnsleaktest.com" target="_blank" rel="noopener noreferrer" class="glass-card rounded-xl p-6 text-center hover:border-orbios-primary/50 transition-all">
+                    <a href="https://dnsleaktest.com" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-6 text-center hover:border-orbios-primary/50 transition-all feature-card">
                         <svg class="w-8 h-8 mx-auto mb-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
                         </svg>
-                        <p class="font-medium text-white">DNS Leak</p>
-                        <p class="text-xs text-gray-500 mt-1">Test DNS security</p>
+                        <p class="font-medium text-white text-sm">DNS Leak</p>
+                        <p class="text-xs text-gray-500 mt-1">Privacy</p>
                     </a>
-                    <a href="https://whatismyipaddress.com" target="_blank" rel="noopener noreferrer" class="glass-card rounded-xl p-6 text-center hover:border-orbios-primary/50 transition-all">
-                        <svg class="w-8 h-8 mx-auto mb-3 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <a href="https://browserleaks.com/webrtc" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-6 text-center hover:border-orbios-primary/50 transition-all feature-card">
+                        <svg class="w-8 h-8 mx-auto mb-3 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                         </svg>
-                        <p class="font-medium text-white">More Info</p>
-                        <p class="text-xs text-gray-500 mt-1">Additional tools</p>
+                        <p class="font-medium text-white text-sm">WebRTC</p>
+                        <p class="text-xs text-gray-500 mt-1">Leak Test</p>
                     </a>
+                    <a href="https://www.ssllabs.com/ssltest/" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-6 text-center hover:border-orbios-primary/50 transition-all feature-card">
+                        <svg class="w-8 h-8 mx-auto mb-3 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <p class="font-medium text-white text-sm">SSL Test</p>
+                        <p class="text-xs text-gray-500 mt-1">Security</p>
+                    </a>
+                    <a href="https://www.ipvoid.com/" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-6 text-center hover:border-orbios-primary/50 transition-all feature-card">
+                        <svg class="w-8 h-8 mx-auto mb-3 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <p class="font-medium text-white text-sm">Blacklist</p>
+                        <p class="text-xs text-gray-500 mt-1">Reputation</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- IP History -->
+            <div id="history-section" class="mb-10 hidden">
+                <h3 class="text-2xl font-display font-bold mb-6 text-center flex items-center justify-center gap-3">
+                    <svg class="w-7 h-7 text-orbios-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    IP History (Local)
+                </h3>
+                <div class="glass-panel rounded-2xl p-6">
+                    <div id="ip-history-list" class="space-y-2">
+                        <p class="text-gray-500 text-sm text-center">No history yet. IPs will be stored locally.</p>
+                    </div>
+                    <div class="mt-4 flex justify-center gap-3">
+                        <button onclick="clearHistory()" class="text-sm text-orbios-danger hover:text-white transition-colors">Clear History</button>
+                    </div>
                 </div>
             </div>
 
             <!-- CTA Section -->
             <div class="text-center">
-                <div class="glass-panel p-8 md:p-12 rounded-2xl border border-white/10">
-                    <h2 class="text-2xl md:text-3xl font-display font-bold mb-4">Need More Advanced Tools?</h2>
-                    <p class="text-gray-400 mb-6 max-w-xl mx-auto">
-                        ORBIOS Pro offers advanced network monitoring, API access, and enterprise-grade IP intelligence.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button onclick="showToast('ORBIOS Pro coming soon!')" class="btn-glow bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-white/90 transition-all">
-                            Get ORBIOS Pro
-                        </button>
-                        <button onclick="scrollToTop()" class="px-8 py-3 glass-panel text-white rounded-lg font-medium hover:bg-white/5 transition-colors">
-                            Back to Top
-                        </button>
+                <div class="glass-panel p-8 md:p-12 rounded-3xl border border-white/10 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-orbios-primary/5 via-orbios-secondary/5 to-orbios-accent/5"></div>
+                    <div class="relative z-10">
+                        <h2 class="text-2xl md:text-3xl font-display font-bold mb-4">Need Enterprise Features?</h2>
+                        <p class="text-gray-400 mb-6 max-w-xl mx-auto">
+                            ORBIOS Pro offers API access, bulk IP lookup, threat intelligence feeds, 
+                            and dedicated support for businesses.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button onclick="showToast('ORBIOS Pro coming Q1 2025!')" class="btn-glow bg-white text-black px-8 py-3 rounded-xl font-bold hover:bg-white/90 transition-all">
+                                Get ORBIOS Pro
+                            </button>
+                            <button onclick="scrollToTop()" class="px-8 py-3 glass-panel text-white rounded-xl font-medium hover:bg-white/5 transition-colors">
+                                Back to Top
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -601,13 +1170,40 @@
         </div>
     </footer>
 
+    <!-- QR Code Modal -->
+    <div id="qr-modal" class="modal-overlay" onclick="closeQRModal(event)">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-white">Share IP Address</h3>
+                <button onclick="closeQRModalDirect()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="qr-code-container" class="flex justify-center mb-6"></div>
+            <p id="qr-ip-text" class="text-center text-gray-400 font-mono text-sm mb-4"></p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="copyQRData()" class="btn-glow bg-white text-black px-6 py-2 rounded-xl font-medium text-sm">
+                    Copy IP
+                </button>
+                <button onclick="closeQRModalDirect()" class="px-6 py-2 glass-panel text-white rounded-xl font-medium text-sm hover:bg-white/5">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 right-4 glass-panel px-6 py-3 rounded-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <div id="toast" class="fixed bottom-4 right-4 glass-panel px-6 py-4 rounded-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 border border-white/10">
         <div class="flex items-center gap-3">
             <svg id="toast-icon" class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            <span id="toast-message" class="text-white text-sm">Copied to clipboard!</span>
+            <div>
+                <span id="toast-message" class="text-white text-sm font-medium block"></span>
+                <span id="toast-submessage" class="text-gray-500 text-xs block"></span>
+            </div>
         </div>
     </div>
 
@@ -616,37 +1212,36 @@
         // Global data storage
         let ipData = {};
         let deviceInfo = {};
+        let fingerprintData = {};
         let currentApiSource = '';
+        let requestCount = 0;
 
         // API Endpoints (multiple for fallback)
         const API_ENDPOINTS = [
-            {
-                name: 'ipapi.co',
-                url: 'https://ipapi.co/json/',
-                format: 'standard'
-            },
-            {
-                name: 'ip-api.com',
-                url: 'http://ip-api.com/json/',
-                format: 'ipapi'
-            },
-            {
-                name: 'ipwhois.app',
-                url: 'https://ipwhois.app/json/',
-                format: 'ipwhois'
-            },
-            {
-                name: 'ip-api (HTTPS)',
-                url: 'https://ip-api.com/json/',
-                format: 'ipapi'
-            }
+            { name: 'ipapi.co', url: 'https://ipapi.co/json/', format: 'standard' },
+            { name: 'ipwhois.app', url: 'https://ipwhois.app/json/', format: 'ipwhois' },
+            { name: 'ip-api.com', url: 'http://ip-api.com/json/', format: 'ipapi' },
+            { name: 'ip-api HTTPS', url: 'https://ip-api.com/json/', format: 'ipapi' }
         ];
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             fetchAllData();
             getDeviceInfo();
+            generateFingerprint();
             updateLastUpdateTime();
+            loadHistory();
+            checkWebRTCDNS();
+            
+            // Keyboard shortcut
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'r' || e.key === 'R') {
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        refreshIPData();
+                    }
+                }
+            });
         });
 
         // Update last update time
@@ -660,6 +1255,23 @@
             document.getElementById('last-update').textContent = timeString;
         }
 
+        // Increment request count
+        function incrementRequestCount() {
+            requestCount++;
+            document.getElementById('request-count').textContent = requestCount;
+            // Save to localStorage
+            localStorage.setItem('orbios_request_count', requestCount);
+        }
+
+        // Load request count from storage
+        function loadRequestCount() {
+            const count = localStorage.getItem('orbios_request_count');
+            if (count) {
+                requestCount = parseInt(count);
+                document.getElementById('request-count').textContent = requestCount;
+            }
+        }
+
         // Fetch all IP and network data with multiple fallbacks
         async function fetchAllData() {
             const loadingEl = document.getElementById('ip-loading');
@@ -669,7 +1281,6 @@
             const statusDot = document.getElementById('system-status-dot');
             const statusText = document.getElementById('system-status-text');
 
-            // Show loading state
             loadingEl.classList.remove('hidden');
             contentEl.classList.add('hidden');
             errorEl.classList.add('hidden');
@@ -680,10 +1291,9 @@
 
             let success = false;
 
-            // Try each API endpoint
             for (const endpoint of API_ENDPOINTS) {
                 try {
-                    apiStatusEl.innerHTML = `<span class="status-dot status-loading"></span> Trying ${endpoint.name}...`;
+                    apiStatusEl.innerHTML = `<span class="status-dot status-loading"></span> ${endpoint.name}...`;
                     
                     const response = await fetch(endpoint.url);
                     
@@ -693,19 +1303,19 @@
                     
                     const data = await response.json();
                     
-                    // Validate the response has IP
-                    if (data && data.ip) {
+                    if (data && (data.ip || data.query)) {
                         ipData = normalizeData(data, endpoint.format);
                         currentApiSource = endpoint.name;
                         success = true;
                         
-                        // Update UI
                         apiStatusEl.className = 'api-status success';
                         apiStatusEl.innerHTML = `<span class="status-dot status-online"></span> ${endpoint.name}`;
                         statusDot.className = 'status-dot status-online';
                         statusText.textContent = 'System Online';
                         
                         displayData(ipData);
+                        incrementRequestCount();
+                        addToHistory(ipData.ip);
                         break;
                     }
                 } catch (error) {
@@ -714,7 +1324,6 @@
                 }
             }
 
-            // Hide loading, show content or error
             loadingEl.classList.add('hidden');
             
             if (success) {
@@ -723,6 +1332,9 @@
                 document.getElementById('location-map').classList.remove('hidden');
                 document.getElementById('info-grid').classList.remove('hidden');
                 document.getElementById('network').classList.remove('hidden');
+                document.getElementById('security-scores').classList.remove('hidden');
+                document.getElementById('history-section').classList.remove('hidden');
+                calculateScores();
             } else {
                 errorEl.classList.remove('hidden');
                 apiStatusEl.className = 'api-status error';
@@ -731,14 +1343,14 @@
                 statusText.textContent = 'Connection Error';
             }
 
-            // Fetch IPv6 separately
             fetchIPv6();
         }
 
         // Normalize data from different API formats
         function normalizeData(data, format) {
-            const normalized = {
+            return {
                 ip: data.ip || data.query || '',
+                ipv6: data.ipv6 || '',
                 country: data.country || data.country_name || '',
                 country_code: data.country_code || data.countryCode || '',
                 region: data.region || data.regionName || data.state || '',
@@ -754,18 +1366,13 @@
                 hosting: data.hosting || false,
                 currency: data.currency || '',
                 languages: data.languages || '',
-                country_calling_code: data.country_calling_code || data.countryCode ? '+' + getPhoneCode(data.country_code || data.countryCode) : ''
+                country_calling_code: data.country_calling_code || '+' + getPhoneCode(data.country_code || data.countryCode)
             };
-            return normalized;
         }
 
-        // Get phone code from country code
         function getPhoneCode(countryCode) {
-            const phoneCodes = {
-                'US': '1', 'GB': '44', 'CA': '1', 'AU': '61', 'DE': '49',
-                'FR': '33', 'IN': '91', 'JP': '81', 'CN': '86', 'BR': '55'
-            };
-            return phoneCodes[countryCode] || 'Unknown';
+            const codes = { US: '1', GB: '44', CA: '1', AU: '61', DE: '49', FR: '33', IN: '91', JP: '81', CN: '86', BR: '55' };
+            return codes[countryCode] || 'Unknown';
         }
 
         // Fetch IPv6 address
@@ -775,6 +1382,7 @@
                 const data = await response.json();
                 const ipv6El = document.getElementById('ipv6-display');
                 ipv6El.textContent = data.ip || 'Not available';
+                ipData.ipv6 = data.ip;
             } catch (error) {
                 document.getElementById('ipv6-display').textContent = 'IPv6 not available';
             }
@@ -782,332 +1390,467 @@
 
         // Display all fetched data
         function displayData(data) {
-            // IPv4 Display
-            const ipv4Element = document.getElementById('ipv4-display');
-            ipv4Element.textContent = data.ip || 'Unknown';
+            // IPv4
+            document.getElementById('ipv4-display').textContent = data.ip || 'Unknown';
 
-            // Protocol Detection
+            // Protocol
             const protocol = data.ip && data.ip.includes(':') ? 'IPv6' : 'IPv4';
             document.getElementById('protocol-display').textContent = protocol;
+            document.getElementById('protocol-version').textContent = 'Version ' + (protocol === 'IPv6' ? '6' : '4');
 
-            // Proxy Detection
-            const proxyStatus = data.proxy ? 'Yes' : 'No';
-            const proxyColor = data.proxy ? 'text-red-400' : 'text-green-400';
-            const proxyElement = document.getElementById('proxy-detect');
-            proxyElement.textContent = proxyStatus;
-            proxyElement.className = `text-2xl font-bold ${proxyColor}`;
+            // Proxy
+            const proxyStatus = data.proxy ? 'Detected' : 'Not Detected';
+            const proxyColor = data.proxy ? 'text-orbios-danger' : 'text-orbios-success';
+            document.getElementById('proxy-detect').textContent = data.proxy ? '⚠️' : '✓';
+            document.getElementById('proxy-detect').className = `text-2xl font-bold ${proxyColor}`;
+            document.getElementById('proxy-status').textContent = proxyStatus;
 
-            // Hosting Detection
+            // Hosting
             const hostingStatus = data.hosting ? 'Yes' : 'No';
-            const hostingColor = data.hosting ? 'text-yellow-400' : 'text-green-400';
-            const hostingElement = document.getElementById('hosting-detect');
-            hostingElement.textContent = hostingStatus;
-            hostingElement.className = `text-2xl font-bold ${hostingColor}`;
+            const hostingColor = data.hosting ? 'text-orbios-warning' : 'text-orbios-success';
+            document.getElementById('hosting-detect').textContent = data.hosting ? '⚠️' : '✓';
+            document.getElementById('hosting-detect').className = `text-2xl font-bold ${hostingColor}`;
+            document.getElementById('hosting-status').textContent = hostingStatus;
 
-            // Location Data
+            // Connection Type
+            const connType = deviceInfo.connectionType || 'Unknown';
+            document.getElementById('connection-type').textContent = connType.charAt(0).toUpperCase() + connType.slice(1);
+
+            // Location
             const flag = getCountryFlag(data.country_code);
-            const locationHTML = `
-                <div class="data-row">
-                    <span class="data-label">Country</span>
-                    <span class="data-value">${flag} ${data.country || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Region</span>
-                    <span class="data-value">${data.region || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">City</span>
-                    <span class="data-value">${data.city || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Postal</span>
-                    <span class="data-value">${data.postal || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Timezone</span>
-                    <span class="data-value">${data.timezone || 'Unknown'}</span>
-                </div>
+            document.getElementById('location-data').innerHTML = `
+                <div class="data-row"><span class="data-label">Country</span><span class="data-value">${flag} ${data.country || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Region</span><span class="data-value">${data.region || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">City</span><span class="data-value">${data.city || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Postal</span><span class="data-value">${data.postal || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Timezone</span><span class="data-value">${data.timezone || 'Unknown'}</span></div>
             `;
-            document.getElementById('location-data').innerHTML = locationHTML;
 
-            // Network Data
-            const networkHTML = `
-                <div class="data-row">
-                    <span class="data-label">ISP</span>
-                    <span class="data-value">${data.isp || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">ASN</span>
-                    <span class="data-value">${data.asn || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Organization</span>
-                    <span class="data-value">${data.org || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Currency</span>
-                    <span class="data-value">${data.currency || 'Unknown'}</span>
-                </div>
+            // Network
+            document.getElementById('network-data').innerHTML = `
+                <div class="data-row"><span class="data-label">ISP</span><span class="data-value">${data.isp || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">ASN</span><span class="data-value">${data.asn || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Organization</span><span class="data-value">${data.org || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Currency</span><span class="data-value">${data.currency || 'Unknown'}</span></div>
             `;
-            document.getElementById('network-data').innerHTML = networkHTML;
 
-            // Map Content
-            const mapContent = `
+            // Map
+            document.getElementById('map-content').innerHTML = `
                 <div class="text-center">
                     <div class="text-4xl mb-2">${flag}</div>
-                    <div class="text-xl font-bold text-white">${data.city || 'Unknown'}, ${data.country || 'Unknown'}</div>
-                    <div class="text-sm text-gray-400 mt-1">${data.latitude}, ${data.longitude}</div>
+                    <div class="text-lg md:text-xl font-bold text-white">${data.city || 'Unknown'}, ${data.country || 'Unknown'}</div>
+                    <div class="text-sm text-gray-400 mt-1 font-mono">${data.latitude}, ${data.longitude}</div>
                 </div>
             `;
-            document.getElementById('map-content').innerHTML = mapContent;
 
             // Full Data Table
-            const fullDataHTML = `
-                <div class="data-row">
-                    <span class="data-label">IP Address</span>
-                    <span class="data-value font-mono">${data.ip || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">IP Version</span>
-                    <span class="data-value">${protocol}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Country</span>
-                    <span class="data-value">${flag} ${data.country || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Country Code</span>
-                    <span class="data-value">${data.country_code || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Region/State</span>
-                    <span class="data-value">${data.region || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">City</span>
-                    <span class="data-value">${data.city || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Postal Code</span>
-                    <span class="data-value">${data.postal || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Latitude</span>
-                    <span class="data-value font-mono">${data.latitude || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Longitude</span>
-                    <span class="data-value font-mono">${data.longitude || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Timezone</span>
-                    <span class="data-value">${data.timezone || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">ISP</span>
-                    <span class="data-value">${data.isp || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">ASN</span>
-                    <span class="data-value">${data.asn || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Organization</span>
-                    <span class="data-value">${data.org || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Proxy Detected</span>
-                    <span class="data-value">${data.proxy ? 'Yes ⚠️' : 'No ✓'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Hosting</span>
-                    <span class="data-value">${data.hosting ? 'Yes' : 'No'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Currency</span>
-                    <span class="data-value">${data.currency || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Languages</span>
-                    <span class="data-value">${data.languages || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Calling Code</span>
-                    <span class="data-value">${data.country_calling_code || 'Unknown'}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Data Source</span>
-                    <span class="data-value">${currentApiSource}</span>
-                </div>
+            document.getElementById('full-data-table').innerHTML = `
+                <div class="data-row"><span class="data-label">IP Address (IPv4)</span><span class="data-value font-mono">${data.ip || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">IP Address (IPv6)</span><span class="data-value font-mono">${data.ipv6 || 'Not available'}</span></div>
+                <div class="data-row"><span class="data-label">Country</span><span class="data-value">${flag} ${data.country || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Country Code</span><span class="data-value">${data.country_code || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Region/State</span><span class="data-value">${data.region || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">City</span><span class="data-value">${data.city || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Postal Code</span><span class="data-value">${data.postal || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Latitude</span><span class="data-value font-mono">${data.latitude || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Longitude</span><span class="data-value font-mono">${data.longitude || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Timezone</span><span class="data-value">${data.timezone || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">ISP</span><span class="data-value">${data.isp || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">ASN</span><span class="data-value">${data.asn || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Organization</span><span class="data-value">${data.org || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Proxy/VPN</span><span class="data-value">${data.proxy ? 'Yes ⚠️' : 'No ✓'}</span></div>
+                <div class="data-row"><span class="data-label">Hosting</span><span class="data-value">${data.hosting ? 'Yes' : 'No'}</span></div>
+                <div class="data-row"><span class="data-label">Currency</span><span class="data-value">${data.currency || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Languages</span><span class="data-value">${data.languages || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Calling Code</span><span class="data-value">${data.country_calling_code || 'Unknown'}</span></div>
+                <div class="data-row"><span class="data-label">Data Source</span><span class="data-value">${currentApiSource}</span></div>
             `;
-            document.getElementById('full-data-table').innerHTML = fullDataHTML;
         }
 
-        // Get device/browser information
+        // Get device info
         function getDeviceInfo() {
-            const userAgent = navigator.userAgent;
-            const platform = navigator.platform;
-            const language = navigator.language;
-            const cookiesEnabled = navigator.cookieEnabled;
-            const doNotTrack = navigator.doNotTrack;
             const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            
             deviceInfo = {
-                userAgent: userAgent,
-                platform: platform,
-                language: language,
-                cookiesEnabled: cookiesEnabled,
-                doNotTrack: doNotTrack || 'Unknown',
+                os: detectOS(),
+                browser: detectBrowser(),
                 screenResolution: `${screen.width}x${screen.height}`,
                 colorDepth: `${screen.colorDepth}-bit`,
                 pixelRatio: window.devicePixelRatio,
-                connectionType: connection ? (connection.effectiveType || 'Unknown') : 'Unknown',
-                downlink: connection ? (connection.downlink || 'Unknown') : 'Unknown',
-                rtt: connection ? (connection.rtt || 'Unknown') : 'Unknown'
+                language: navigator.language,
+                cookiesEnabled: navigator.cookieEnabled,
+                doNotTrack: navigator.doNotTrack || 'Unknown',
+                connectionType: connection ? (connection.effectiveType || 'unknown') : 'unknown',
+                downlink: connection ? (connection.downlink || 'N/A') : 'N/A',
+                rtt: connection ? (connection.rtt || 'N/A') : 'N/A'
             };
 
-            // Detect OS
-            let os = 'Unknown';
-            if (userAgent.indexOf('Win') !== -1) os = 'Windows';
-            if (userAgent.indexOf('Mac') !== -1) os = 'macOS';
-            if (userAgent.indexOf('Linux') !== -1) os = 'Linux';
-            if (userAgent.indexOf('Android') !== -1) os = 'Android';
-            if (userAgent.indexOf('like Mac') !== -1) os = 'iOS';
-
-            // Detect Browser
-            let browser = 'Unknown';
-            if (userAgent.indexOf('Chrome') !== -1 && userAgent.indexOf('Edg') === -1) browser = 'Chrome';
-            if (userAgent.indexOf('Firefox') !== -1) browser = 'Firefox';
-            if (userAgent.indexOf('Safari') !== -1 && userAgent.indexOf('Chrome') === -1) browser = 'Safari';
-            if (userAgent.indexOf('Edg') !== -1) browser = 'Edge';
-            if (userAgent.indexOf('OPR') !== -1) browser = 'Opera';
-
-            deviceInfo.os = os;
-            deviceInfo.browser = browser;
-
-            // Display device info
-            const deviceHTML = `
-                <div class="data-row">
-                    <span class="data-label">OS</span>
-                    <span class="data-value">${os}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Browser</span>
-                    <span class="data-value">${browser}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Screen</span>
-                    <span class="data-value">${deviceInfo.screenResolution}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Language</span>
-                    <span class="data-value">${language}</span>
-                </div>
+            document.getElementById('device-data').innerHTML = `
+                <div class="data-row"><span class="data-label">OS</span><span class="data-value">${deviceInfo.os}</span></div>
+                <div class="data-row"><span class="data-label">Browser</span><span class="data-value">${deviceInfo.browser}</span></div>
+                <div class="data-row"><span class="data-label">Screen</span><span class="data-value">${deviceInfo.screenResolution}</span></div>
+                <div class="data-row"><span class="data-label">Language</span><span class="data-value">${deviceInfo.language}</span></div>
             `;
-            document.getElementById('device-data').innerHTML = deviceHTML;
+
+            document.getElementById('quality-data').innerHTML = `
+                <div class="data-row"><span class="data-label">Type</span><span class="data-value">${deviceInfo.connectionType.toUpperCase()}</span></div>
+                <div class="data-row"><span class="data-label">Downlink</span><span class="data-value">${deviceInfo.downlink} Mbps</span></div>
+                <div class="data-row"><span class="data-label">RTT</span><span class="data-value">${deviceInfo.rtt} ms</span></div>
+                <div class="data-row"><span class="data-label">Pixel Ratio</span><span class="data-value">${deviceInfo.pixelRatio}x</span></div>
+            `;
         }
 
-        // Get country flag emoji
-        function getCountryFlag(countryCode) {
-            if (!countryCode) return '🌍';
-            const code = countryCode.toUpperCase();
-            return code.replace(/./g, char => String.fromCodePoint(char.charCodeAt(0) + 127397));
+        function detectOS() {
+            const ua = navigator.userAgent;
+            if (ua.indexOf('Win') !== -1) return 'Windows';
+            if (ua.indexOf('Mac') !== -1) return 'macOS';
+            if (ua.indexOf('Linux') !== -1) return 'Linux';
+            if (ua.indexOf('Android') !== -1) return 'Android';
+            if (ua.indexOf('like Mac') !== -1) return 'iOS';
+            return 'Unknown';
+        }
+
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            if (ua.indexOf('Chrome') !== -1 && ua.indexOf('Edg') === -1) return 'Chrome';
+            if (ua.indexOf('Firefox') !== -1) return 'Firefox';
+            if (ua.indexOf('Safari') !== -1 && ua.indexOf('Chrome') === -1) return 'Safari';
+            if (ua.indexOf('Edg') !== -1) return 'Edge';
+            if (ua.indexOf('OPR') !== -1) return 'Opera';
+            return 'Unknown';
+        }
+
+        // Generate browser fingerprint
+        function generateFingerprint() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('ORBIOS Fingerprint', 2, 2);
+            const canvasData = canvas.toDataURL();
+            
+            fingerprintData = {
+                canvas: canvasData.substring(0, 50),
+                webgl: getWebGLFingerprint(),
+                audio: getAudioFingerprint(),
+                fonts: getFontsFingerprint(),
+                plugins: navigator.plugins.length,
+                languages: navigator.languages.length
+            };
+
+            const fingerprint = generateHash(JSON.stringify(fingerprintData));
+            
+            document.getElementById('fingerprint-data').innerHTML = `
+                <div class="data-row"><span class="data-label">Hash</span><span class="data-value">${fingerprint.substring(0, 16)}...</span></div>
+                <div class="data-row"><span class="data-label">Plugins</span><span class="data-value">${fingerprintData.plugins}</span></div>
+                <div class="data-row"><span class="data-label">Fonts</span><span class="data-value">${fingerprintData.fonts}</span></div>
+                <div class="data-row"><span class="data-label">Languages</span><span class="data-value">${fingerprintData.languages}</span></div>
+            `;
+        }
+
+        function getWebGLFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl');
+                if (!gl) return 'N/A';
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (!debugInfo) return 'N/A';
+                return gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+
+        function getAudioFingerprint() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const analyser = audioCtx.createAnalyser();
+                const gain = audioCtx.createGain();
+                oscillator.connect(analyser);
+                analyser.connect(gain);
+                gain.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop();
+                return 'supported';
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+
+        function getFontsFingerprint() {
+            const baseFonts = ['monospace', 'sans-serif', 'serif'];
+            const testFonts = ['Arial', 'Verdana', 'Times New Roman', 'Courier New', 'Georgia'];
+            let detected = 0;
+            testFonts.forEach(font => {
+                if (document.fonts.check(`12px "${font}"`)) detected++;
+            });
+            return detected;
+        }
+
+        function generateHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16).padStart(32, '0');
+        }
+
+        // Check DNS and WebRTC
+        function checkWebRTCDNS() {
+            // WebRTC check (simplified)
+            const isWebRTCSupported = !!(window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection);
+            document.getElementById('webrtc-status').textContent = isWebRTCSupported ? 'Supported' : 'Blocked';
+            document.getElementById('webrtc-status').className = `badge ${isWebRTCSupported ? 'badge-warning' : 'badge-success'}`;
+
+            // TLS check
+            document.getElementById('tls-status').textContent = window.location.protocol === 'https:' ? 'Secure' : 'Not Secure';
+            document.getElementById('tls-status').className = `badge ${window.location.protocol === 'https:' ? 'badge-success' : 'badge-danger'}`;
+
+            // DNS (simplified - show browser DNS)
+            document.getElementById('dns-data').innerHTML = `
+                <div class="data-row"><span class="data-label">DoH Support</span><span class="data-value">Check browser</span></div>
+                <div class="data-row"><span class="data-label">DNS over TLS</span><span class="data-value">Check system</span></div>
+                <div class="data-row"><span class="data-label">IPv6 DNS</span><span class="data-value">Auto</span></div>
+            `;
+        }
+
+        // Calculate security scores
+        function calculateScores() {
+            let securityScore = 100;
+            let privacyScore = 100;
+            let trustScore = 100;
+
+            // Security factors
+            if (ipData.proxy) securityScore -= 30;
+            if (ipData.hosting) securityScore -= 20;
+            if (deviceInfo.doNotTrack === '1') securityScore += 10;
+
+            // Privacy factors
+            if (!deviceInfo.cookiesEnabled) privacyScore += 10;
+            if (deviceInfo.doNotTrack === '1') privacyScore += 15;
+            if (window.location.protocol === 'https:') privacyScore += 10;
+
+            // Trust factors
+            if (!ipData.proxy) trustScore += 20;
+            if (!ipData.hosting) trustScore += 10;
+            trustScore = Math.min(100, trustScore);
+
+            // Ensure scores are between 0-100
+            securityScore = Math.max(0, Math.min(100, securityScore));
+            privacyScore = Math.max(0, Math.min(100, privacyScore));
+            trustScore = Math.max(0, Math.min(100, trustScore));
+
+            // Update UI
+            updateScore('security', securityScore);
+            updateScore('privacy', privacyScore);
+            updateScore('trust', trustScore);
+        }
+
+        function updateScore(type, score) {
+            const element = document.getElementById(`${type}-score`);
+            const circle = document.getElementById(`${type}-score-circle`);
+            const rating = document.getElementById(`${type}-rating`);
+            
+            element.textContent = score;
+            circle.style.setProperty('--score-percent', `${score * 3.6}deg`);
+            
+            let color, ratingText;
+            if (score >= 80) {
+                color = '#22c55e';
+                ratingText = 'Excellent';
+            } else if (score >= 60) {
+                color = '#eab308';
+                ratingText = 'Good';
+            } else if (score >= 40) {
+                color = '#f97316';
+                ratingText = 'Fair';
+            } else {
+                color = '#ef4444';
+                ratingText = 'Poor';
+            }
+            
+            circle.style.setProperty('--score-color', color);
+            rating.textContent = ratingText;
+            rating.style.color = color;
+        }
+
+        // Get country flag
+        function getCountryFlag(code) {
+            if (!code) return '🌍';
+            return code.toUpperCase().replace(/./g, c => String.fromCodePoint(c.charCodeAt(0) + 127397));
         }
 
         // Refresh IP data
         function refreshIPData() {
-            // Show loading state
             document.getElementById('ipv4-display').textContent = 'Loading...';
             document.getElementById('ip-loading').classList.remove('hidden');
             document.getElementById('ip-content').classList.add('hidden');
             document.getElementById('ip-error').classList.add('hidden');
             
-            // Clear and reload
             ipData = {};
             fetchAllData();
             getDeviceInfo();
             updateLastUpdateTime();
-            
-            // Animate refresh icon
+
             const icon = document.getElementById('refresh-icon');
             icon.style.animation = 'spin 1s ease-in-out';
-            setTimeout(() => {
-                icon.style.animation = '';
-            }, 1000);
+            setTimeout(() => icon.style.animation = '', 1000);
         }
 
         // Copy to clipboard
-        function copyToClipboard(elementId) {
-            const element = document.getElementById(elementId);
-            const text = element.textContent;
-            
+        function copyToClipboard(elementId, label) {
+            const text = document.getElementById(elementId).textContent;
             navigator.clipboard.writeText(text).then(() => {
-                showToast('IP copied to clipboard!');
-            }).catch(err => {
-                // Fallback for older browsers
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showToast('IP copied to clipboard!');
+                showToast(`${label} copied!`, 'Address copied to clipboard');
+            }).catch(() => {
+                showToast('Copy failed', 'Please try manually');
             });
         }
 
         // Copy all data
         function copyAllData() {
-            const completeData = {
-                ...ipData,
-                deviceInfo: deviceInfo,
-                timestamp: new Date().toISOString()
-            };
-            
-            const text = JSON.stringify(completeData, null, 2);
-            
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('All data copied to clipboard!');
+            const data = { ...ipData, deviceInfo, fingerprint: fingerprintData, timestamp: new Date().toISOString() };
+            navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
+                showToast('All data copied!', 'Ready to paste');
             }).catch(() => {
-                showToast('Failed to copy data');
+                showToast('Copy failed', 'Please try manually');
             });
         }
 
         // Download JSON
         function downloadJSON() {
-            const completeData = {
-                ...ipData,
-                deviceInfo: deviceInfo,
-                timestamp: new Date().toISOString()
-            };
-            
-            const dataStr = JSON.stringify(completeData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            
+            const data = { ...ipData, deviceInfo, fingerprint: fingerprintData, timestamp: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `orbios-ip-data-${Date.now()}.json`;
+            link.download = `orbios-ip-${Date.now()}.json`;
             link.click();
-            
             URL.revokeObjectURL(url);
-            showToast('JSON downloaded!');
+            showToast('JSON downloaded!', 'Check your downloads folder');
         }
 
-        // Show toast notification
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-            const toastIcon = document.getElementById('toast-icon');
-            
-            toastMessage.textContent = message;
-            
-            if (type === 'error') {
-                toastIcon.classList.remove('text-green-400');
-                toastIcon.classList.add('text-red-400');
+        // Download CSV
+        function downloadCSV() {
+            const data = { ...ipData, ...deviceInfo };
+            const headers = Object.keys(data);
+            const values = Object.values(data);
+            const csv = [headers.join(','), values.map(v => `"${v}"`).join(',')].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `orbios-ip-${Date.now()}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast('CSV downloaded!', 'Check your downloads folder');
+        }
+
+        // Share data
+        async function shareData() {
+            const text = `IP: ${ipData.ip}\nLocation: ${ipData.city}, ${ipData.country}\nISP: ${ipData.isp}`;
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'ORBIOS IP Info', text });
+                    showToast('Shared successfully!', '');
+                } catch (e) {
+                    copyToClipboardFromText(text);
+                }
             } else {
-                toastIcon.classList.remove('text-red-400');
-                toastIcon.classList.add('text-green-400');
+                copyToClipboardFromText(text);
             }
+        }
+
+        function copyToClipboardFromText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!', 'Ready to share');
+            });
+        }
+
+        // QR Code Modal
+        function showQRCode(elementId) {
+            const ip = document.getElementById(elementId).textContent;
+            document.getElementById('qr-ip-text').textContent = ip;
+            document.getElementById('qr-code-container').innerHTML = '';
+            
+            new QRCode(document.getElementById('qr-code-container'), {
+                text: ip,
+                width: 200,
+                height: 200,
+                colorDark: '#00f0ff',
+                colorLight: '#0a0a0a',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            document.getElementById('qr-modal').classList.add('active');
+        }
+
+        function closeQRModal(e) {
+            if (e.target.id === 'qr-modal') {
+                closeQRModalDirect();
+            }
+        }
+
+        function closeQRModalDirect() {
+            document.getElementById('qr-modal').classList.remove('active');
+        }
+
+        function copyQRData() {
+            const ip = document.getElementById('qr-ip-text').textContent;
+            copyToClipboardFromText(ip);
+        }
+
+        // IP History
+        function addToHistory(ip) {
+            if (!ip) return;
+            let history = JSON.parse(localStorage.getItem('orbios_ip_history') || '[]');
+            const entry = { ip, timestamp: new Date().toISOString() };
+            
+            // Avoid duplicates
+            if (!history.some(h => h.ip === ip)) {
+                history.unshift(entry);
+                history = history.slice(0, 10); // Keep last 10
+                localStorage.setItem('orbios_ip_history', JSON.stringify(history));
+                loadHistory();
+            }
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('orbios_ip_history') || '[]');
+            const container = document.getElementById('ip-history-list');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center">No history yet.</p>';
+                return;
+            }
+            
+            container.innerHTML = history.map(h => `
+                <div class="flex items-center justify-between p-3 glass-card rounded-xl">
+                    <span class="font-mono text-sm">${h.ip}</span>
+                    <span class="text-xs text-gray-500">${new Date(h.timestamp).toLocaleString()}</span>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('orbios_ip_history');
+            loadHistory();
+            showToast('History cleared', '');
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            document.getElementById('theme-toggle').classList.toggle('active');
+            showToast('Theme toggle', 'Feature coming soon');
+        }
+
+        // Toast notification
+        function showToast(message, submessage = '') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            document.getElementById('toast-submessage').textContent = submessage;
             
             toast.classList.remove('translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
@@ -1118,28 +1861,23 @@
             }, 3000);
         }
 
-        // Scroll to top
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Smooth scroll for navigation links
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
     </script>
 
-    <!-- Three.js Animation Script -->
+    <!-- Three.js Animation -->
     <script>
         const container = document.getElementById('canvas-container');
-        
-        // Scene Setup
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0x050505, 0.002);
 
@@ -1150,87 +1888,46 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // Create Particles Sphere
         const geometry = new THREE.IcosahedronGeometry(10, 2);
-        const material = new THREE.PointsMaterial({
-            color: 0x00f0ff,
-            size: 0.15,
-            transparent: true,
-            opacity: 0.8,
-            sizeAttenuation: true
-        });
-
+        const material = new THREE.PointsMaterial({ color: 0x00f0ff, size: 0.15, transparent: true, opacity: 0.8 });
         const particles = new THREE.Points(geometry, material);
         scene.add(particles);
 
-        // Wireframe Overlay
         const wireframeGeo = new THREE.IcosahedronGeometry(10.1, 2);
-        const wireframeMat = new THREE.MeshBasicMaterial({
-            color: 0x7000ff,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.05
-        });
+        const wireframeMat = new THREE.MeshBasicMaterial({ color: 0x7000ff, wireframe: true, transparent: true, opacity: 0.05 });
         const wireframe = new THREE.Mesh(wireframeGeo, wireframeMat);
         scene.add(wireframe);
 
-        // Floating particles
         const starsGeometry = new THREE.BufferGeometry();
-        const starsCount = 1000;
-        const posArray = new Float32Array(starsCount * 3);
-        
-        for(let i = 0; i < starsCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 100;
-        }
-        
+        const posArray = new Float32Array(1000 * 3);
+        for(let i = 0; i < 1000 * 3; i++) posArray[i] = (Math.random() - 0.5) * 100;
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const starsMaterial = new THREE.PointsMaterial({
-            size: 0.05,
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.4
-        });
-        const starMesh = new THREE.Points(starsGeometry, starsMaterial);
+        const starMesh = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: 0.05, color: 0xffffff, transparent: true, opacity: 0.4 }));
         scene.add(starMesh);
 
         camera.position.z = 25;
 
-        // Mouse Interaction
-        let mouseX = 0;
-        let mouseY = 0;
-
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
-
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX - windowHalfX) * 0.001;
-            mouseY = (event.clientY - windowHalfY) * 0.001;
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
         });
 
-        // Animation Loop
         const clock = new THREE.Clock();
-
         function animate() {
             requestAnimationFrame(animate);
-            
-            const elapsedTime = clock.getElapsedTime();
-
+            const t = clock.getElapsedTime();
             particles.rotation.y += 0.002;
             particles.rotation.x += 0.001;
             wireframe.rotation.y -= 0.001;
-            wireframe.rotation.x -= 0.0005;
             starMesh.rotation.y += 0.0005;
-
             particles.rotation.y += 0.05 * (mouseX - particles.rotation.y);
             particles.rotation.x += 0.05 * (mouseY - particles.rotation.x);
-            particles.position.y = Math.sin(elapsedTime * 0.5) * 0.5;
-
+            particles.position.y = Math.sin(t * 0.5) * 0.5;
             renderer.render(scene, camera);
         }
-
         animate();
 
-        // Handle Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
